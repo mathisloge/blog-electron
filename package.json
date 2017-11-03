@@ -1,0 +1,26 @@
+{
+  "name": "blog-electron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mathisloge/blog-electron.git"
+  },
+  "author": "Mathis Logemann",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/mathisloge/blog-electron/issues"
+  },
+  "homepage": "https://github.com/mathisloge/blog-electron#readme",
+  "dependencies": {
+    "spectre.css": "^0.4.5"
+  },
+  "devDependencies": {
+    "electron": "1.7.9"
+  }
+}
