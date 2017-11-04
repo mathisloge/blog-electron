@@ -30,7 +30,7 @@ function createMainWindow () {
     });
 
     mainWindow.webContents.on('new-window', (event, url, frameName, disposition, options, additionalFeatures) => {
-        if (frameName === 'auth') {
+        if (frameName === 'modal') {
             // open window as modal
             event.preventDefault();
             Object.assign(options, {
