@@ -36,8 +36,8 @@ function createMainWindow () {
             Object.assign(options, {
                 modal: true,
                 parent: mainWindow,
-                width: 200,
-                height: 200
+                width: 800,
+                height: 800
             });
             event.newGuest = new BrowserWindow(options);
         }
