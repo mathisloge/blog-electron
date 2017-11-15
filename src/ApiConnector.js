@@ -6,7 +6,7 @@
 */
 
 const { remote } = require('electron');
-const Loader = require("./Loader");
+const Loader = require("./Loader").default;
 const axios = require("axios");
 
 const REQUEST_TOKEN_URL = 'https://public-api.wordpress.com/oauth2/token'
@@ -29,18 +29,12 @@ exports.default = class ApiConnector {
 
         this.handleError = (error) => {
             if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
                 console.log(error.response.data);
                 console.log(error.response.status);
                 console.log(error.response.headers);
             } else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
                 console.log(error.request);
             } else {
-                // Something happened in setting up the request that triggered an Error
                 console.log('Error', error.message);
             }
             console.log(error.config);
@@ -52,17 +46,8 @@ exports.default = class ApiConnector {
             const code = this.triggerSignIn();
             code.then((state) => {
                 this.loader.hideLoader();
-                this.access_token = state.access_token;
                 this.expires_in = state.expires_in;
-                this.token_type = state.token_type;
-                this.site_id = state.site_id;
-                this.ready = true;
-
-                this.axiosInstance = axios.create({
-                    baseURL: WORDPRESS_API_URL,
-                    timeout: 1000,
-                    headers: { 'Authorization': this.token_type + " " + this.access_token }
-                });
+                this.initAuthThings(state.token_type, state.access_token, state.site_id);
                 resolve(true);
             }).catch((err) => {
                 this.loader.hideLoader();
@@ -86,12 +71,52 @@ exports.default = class ApiConnector {
         });
     }
 
+    createPost(){
+
+    }
+
+    updatePost(){
+        
+    }
+
+    initAuthThings(token_type, access_token, site_id) {
+        this.ready = true;
+        this.access_token = access_token;
+        this.token_type = token_type;
+        this.site_id = site_id;
+        this.axiosInstance = axios.create({
+            baseURL: WORDPRESS_API_URL,
+            timeout: 1000,
+            headers: { 'Authorization': this.token_type + " " + this.access_token }
+        });
+    }
 
 
+    checkToken(token_type, access_token) {
+        let loader = new Loader();
+        return new Promise((resolve, reject) => {
+            const params = {
+                client_id: CLIENT_ID,
+                token: access_token
+            };
+            axios.get(WORDPRESS_API_URL + "/oauth2/token-info?"+this.encodeData(params))
+            .then((response) => {
+                console.log(response.data);
+                loader.hideLoader();
+                this.initAuthThings(token_type, access_token, response.data.blog_id);
+                resolve(true);
+            })
+            .catch((error) => {
+                loader.hideLoader();
+                this.handleError(error);
+                reject(error);
+            });
+        });
+    }
 
     triggerSignIn() {
         return new Promise((resolve, reject) => {
-            this.loader = new Loader.default();
+            this.loader = new Loader();
             let wordpressAuthUrl = AUTHENTICATE_URL + '?response_type=' + RESPONSE_TYPE +
                 "&client_id=" + CLIENT_ID +
                 "&state=" + this.state +
@@ -153,4 +178,10 @@ exports.default = class ApiConnector {
         });
 
     }
+
+    encodeData(data) {
+        return Object.keys(data).map(function(key) {
+            return [key, data[key]].map(encodeURIComponent).join("=");
+        }).join("&");
+    }  
 }

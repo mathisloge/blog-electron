@@ -1,6 +1,7 @@
 @import "../node_modules/spectre.css/dist/spectre.css";
 @import "../node_modules/spectre.css/dist/spectre-exp.css";
 @import "../node_modules/smalltalk/dist/smalltalk.min.css";
+@import "../node_modules/jodit/build/jodit.min.css";
 body {
     background-color: skyblue;
 }
@@ -14,3 +15,16 @@ body {
 .loader {
     position: absolute;
 }
+
+.post {
+
+}
+
+.post img {
+    width: 100%;
+}
+
+
+/*
+Editable CSS
+*/

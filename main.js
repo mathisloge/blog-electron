@@ -1,11 +1,13 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, Menu} = require('electron')
 const path = require('path')
 const url = require('url')
 const ApiConnector = require("./src/ApiConnector");
-
+const {menuStruct} = require("./src/mainProcess/menu");
+const {Auth} = require("./src/mainProcess/Auth");
 let mainWindow;
-
-function createMainWindow () {
+let menu;
+const auth = new Auth();
+function createMainWindow (token = null, site = null) {
     mainWindow = new BrowserWindow(
         {
             width: 800,
@@ -16,12 +18,18 @@ function createMainWindow () {
             }
         }
     );
-
+    let params = "?";
+    if(token !== null){
+        params += "token="+token+"&";
+    }
+    if(site !== null){
+        params += "site="+site+"&";
+    }
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
-    }));
+    })+params);
 
     // Debug
     mainWindow.webContents.openDevTools();
@@ -44,7 +52,23 @@ function createMainWindow () {
     });
 }
 
-app.on('ready', createMainWindow);
+
+function startUp() {
+    menu = Menu.buildFromTemplate(menuStruct);
+    Menu.setApplicationMenu(menu);
+    let state = auth.init();
+    state.then( (status) => {
+        if(status == true && auth.bearer_token !== null){
+            createMainWindow(auth.bearer_token, auth.site);
+        }
+        else
+            createMainWindow();
+    }).catch( (err) => {
+        createMainWindow();
+    });
+   
+}
+app.on('ready', startUp);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -54,6 +78,6 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (win === null) {
-    createMainWindow()
+    startUp();
   }
 });
