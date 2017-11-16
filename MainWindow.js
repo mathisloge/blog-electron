@@ -74,6 +74,7 @@ class MainWindow {
             for (let post of response.posts) {
                 this.posts.push(new Post(this.api, post.title, post.content, post.tags, post.status, parent, post.ID, post.URL, post.date));
             }
+            this.posts.push(new Post(this.api, "Titel", null, null, null, parent, null, null, null, true));
             loader.hideLoader();
             
             for (let post of this.posts) {
