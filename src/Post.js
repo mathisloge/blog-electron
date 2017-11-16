@@ -1,5 +1,5 @@
 require("./../node_modules/jodit/build/jodit.min.js");
-
+const Loader = require("./Loader").default;
 exports.default = class Post {
     constructor(apiconnector, title, content, tags, status, parent, id = null, url = null, date = null, createPost = false){
         this.title = title;
@@ -32,7 +32,9 @@ exports.default = class Post {
         }
 
         this. save = () => {
-            let content = this.editor.getEditorValue();
+            let loader = new Loader();
+
+            this.content = this.editor.getEditorValue();
             this.editor.destruct();
             this.editor = null;
 
@@ -42,6 +44,22 @@ exports.default = class Post {
             this.titleHTML.innerHTML = this.title;
             this.editButton.style.display = 'inline-block';
             this.saveButton.style.display = "none";
+            if(this.id) {
+                this.api.updatePost().then( () => loader.hideLoader()).catch( (err) => console.error(err));
+                loader.hideLoader();
+            }
+            else {
+                let createPostPromise = this.api.createPost(this.date, this.title, this.content);
+                createPostPromise.then( (post) => {
+                    this.id = post.ID;
+                    this.url = post.URL;
+                    loader.hideLoader();
+                })
+                .catch( (err) => {
+                    console.error(err);
+                    loader.hideLoader();
+                })
+            }
         }            
         this.buildHtml();
         

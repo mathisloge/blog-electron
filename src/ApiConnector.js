@@ -8,13 +8,16 @@
 const { remote } = require('electron');
 const Loader = require("./Loader").default;
 const axios = require("axios");
+const Curl = require( 'node-libcurl' ).Curl;
 
-const REQUEST_TOKEN_URL = 'https://public-api.wordpress.com/oauth2/token'
-const AUTHENTICATE_URL = 'https://public-api.wordpress.com/oauth2/authenticate';
+const WORDPRESS_BASE_API_URL = "https://public-api.wordpress.com/";
+const REQUEST_TOKEN_URL = WORDPRESS_BASE_API_URL+'oauth2/token'
+const AUTHENTICATE_URL = WORDPRESS_BASE_API_URL+'oauth2/authenticate';
+const AUTHORIZE_URL = WORDPRESS_BASE_API_URL+'oauth2/authorize';
 const CLIENT_SECRET = "OrdfIlFHPiIKpuFWCSJsNaI0T3WlmOxnCsASaFYBumfOJhMQZcQeuoPVmtBelCQ5";
 const CLIENT_ID = 55898;
 const RESPONSE_TYPE = "token";
-const WORDPRESS_API_URL = 'https://public-api.wordpress.com/rest/v1.1';
+const WORDPRESS_API_URL = WORDPRESS_BASE_API_URL+'rest/v1.2';
 
 exports.default = class ApiConnector {
     constructor(site_url) {
@@ -71,8 +74,23 @@ exports.default = class ApiConnector {
         });
     }
 
-    createPost(){
-
+    createPost(date, title, content){
+        return new Promise((resolve, reject) => {
+            //if (this.ready && this.axiosInstance) {
+                this.axiosInstance.post("/sites/" + this.site_url + "/posts/new", {
+                    date: date,
+                    title: title,
+                    content: content,
+                    status: "publish"
+                }).then((response) => {
+                    resolve(response.data);
+                })
+                .catch((error) => {
+                    this.handleError(error);
+                    reject(error);
+                });
+            //}
+        });
     }
 
     updatePost(){
@@ -99,9 +117,9 @@ exports.default = class ApiConnector {
                 client_id: CLIENT_ID,
                 token: access_token
             };
-            axios.get(WORDPRESS_API_URL + "/oauth2/token-info?"+this.encodeData(params))
+            axios.get(WORDPRESS_BASE_API_URL + "/oauth2/token-info?"+this.encodeData(params))
             .then((response) => {
-                console.log(response.data);
+                console.log(response);
                 loader.hideLoader();
                 this.initAuthThings(token_type, access_token, response.data.blog_id);
                 resolve(true);
@@ -117,7 +135,7 @@ exports.default = class ApiConnector {
     triggerSignIn() {
         return new Promise((resolve, reject) => {
             this.loader = new Loader();
-            let wordpressAuthUrl = AUTHENTICATE_URL + '?response_type=' + RESPONSE_TYPE +
+            let wordpressAuthUrl = AUTHORIZE_URL + '?response_type=' + RESPONSE_TYPE +
                 "&client_id=" + CLIENT_ID +
                 "&state=" + this.state +
                 "&redirect_uri=http://localhost";
@@ -151,6 +169,9 @@ exports.default = class ApiConnector {
                     }
 
                     authWindow.close();
+                    console.log(access_token);
+                    console.log(redirectUrl);
+
                     resolve({
                         access_token: access_token,
                         expires_in: expires_in,

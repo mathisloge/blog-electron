@@ -2,6 +2,8 @@ const ApiConnector = require("./src/ApiConnector").default;
 const Loader = require("./src/Loader").default;
 const Post = require("./src/Post").default;
 const smalltalk = require("smalltalk");
+
+/* url params auslesen. Siehe main.js: site und token werden bisher gesetzt, falls cookies gesetzt wurden. */
 let urlParams;
 (window.onpopstate = function () {
     let match,

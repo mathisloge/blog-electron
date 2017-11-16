@@ -20,6 +20,7 @@
   "dependencies": {
     "axios": "^0.17.0",
     "jodit": "^3.0.35",
+    "node-libcurl": "^1.2.0",
     "smalltalk": "^2.5.1",
     "spectre.css": "^0.4.5"
   },
