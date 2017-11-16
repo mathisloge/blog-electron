@@ -18,6 +18,7 @@ let urlParams;
 class MainWindow {
     constructor() {
         this.editor;
+        this.postContainer = document.getElementById("posts");
         if("site" in urlParams && "token" in urlParams){
             this.api = new ApiConnector(this.params.site);
             let checkPromise = this.api.checkToken("Bearer", this.params.token);
@@ -33,6 +34,20 @@ class MainWindow {
         else {
             this.openStartupWindow();
         }
+
+        document.addEventListener("file-new", () => {
+            this.newPost();
+        });
+    }
+
+    newPost(){
+        if(!this.newpost || !this.newpost.editor){
+            this.newpost = new Post(this.api, "Titel", null, null, null, this.postContainer, null, null, null, true);
+            this.posts.push(this.newpost);
+            this.newpost.show();
+        }
+        else
+            smalltalk.alert("Nur ein neuer Post gleichzeitig.", "Es kann nur maximal ein Post gleichzeitig neu erstellt werden.");
     }
 
     openStartupWindow(){
@@ -68,13 +83,11 @@ class MainWindow {
         let loader = new Loader();
         let posts = this.api.getPosts();
         posts.then((response) => {
-            console.log(response);
-            let parent = document.getElementById("posts");
             this.posts = [];
             for (let post of response.posts) {
-                this.posts.push(new Post(this.api, post.title, post.content, post.tags, post.status, parent, post.ID, post.URL, post.date));
+                this.posts.push(new Post(this.api, post.title, post.content, post.tags, post.status, this.postContainer, post.ID, post.URL, post.date));
             }
-            this.posts.push(new Post(this.api, "Titel", null, null, null, parent, null, null, null, true));
+            
             loader.hideLoader();
             
             for (let post of this.posts) {
@@ -88,3 +101,7 @@ class MainWindow {
 }
 
 let mainWindow = new MainWindow();
+
+require('electron').ipcRenderer.on('ping', (event, message) => {
+    console.log(message)  // Prints 'whoooooooh!'
+})

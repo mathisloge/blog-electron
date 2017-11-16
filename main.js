@@ -54,7 +54,9 @@ function createMainWindow (token = null, site = null) {
 
 
 function startUp() {
-    menu = Menu.buildFromTemplate(menuStruct);
+    menu = Menu.buildFromTemplate(menuStruct(() => {
+        mainWindow.webContents.executeJavaScript("document.dispatchEvent(new Event('file-new'));")
+    }));
     Menu.setApplicationMenu(menu);
     let state = auth.init();
     state.then( (status) => {

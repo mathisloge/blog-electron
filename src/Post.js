@@ -99,7 +99,11 @@ exports.default = class Post {
         this.html.appendChild(footer);
     }
     show() {
-        this.parent.appendChild(this.html);
+        if(this.editor){
+            this.parent.prepend(this.html);
+        }
+        else
+            this.parent.appendChild(this.html);
     }
 
     hide(){
