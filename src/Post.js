@@ -1,7 +1,9 @@
 require("./../node_modules/jodit/build/jodit.min.js");
 const Loader = require("./Loader").default;
+
 exports.default = class Post {
     constructor(apiconnector, title, content, tags, status, parent, id = null, url = null, date = null, createPost = false){
+        this.api = apiconnector;
         this.title = title;
         this.content = content;
         this.tags = tags;
@@ -14,7 +16,6 @@ exports.default = class Post {
             this.date = new Date();
         this.parent = parent;
         this.editor = null;
-        this.api = apiconnector;
         
         this.edit = () => {
             if(!this.editor)
@@ -31,7 +32,7 @@ exports.default = class Post {
             this.saveButton.style.display = "inline-block";
         }
 
-        this. save = () => {
+        this.save = () => {
             let loader = new Loader();
 
             this.content = this.editor.getEditorValue();
@@ -45,12 +46,12 @@ exports.default = class Post {
             this.editButton.style.display = 'inline-block';
             this.saveButton.style.display = "none";
             if(this.id) {
-                this.api.updatePost().then( () => loader.hideLoader()).catch( (err) => console.error(err));
+                this.api.updatePost(this.id, this.title, this.content).then( () => loader.hideLoader()).catch( (err) => console.error(err));
                 loader.hideLoader();
             }
             else {
-                let createPostPromise = this.api.createPost(this.date, this.title, this.content);
-                createPostPromise.then( (post) => {
+                this.api.createPost(this.date, this.title, this.content)
+                .then( (post) => {
                     this.id = post.ID;
                     this.url = post.URL;
                     loader.hideLoader();
@@ -61,6 +62,28 @@ exports.default = class Post {
                 })
             }
         }            
+
+        this.delete = () => {
+            let className = this.deleteButton.className;
+            this.deleteButton.className = "btn loading";
+            let loader = new Loader();
+            if(!this.id){
+                this.deleteButton.className = className;
+                document.dispatchEvent(new CustomEvent("post-deleted", {detail: { post:this }})); 
+                loader.hideLoader();
+            }
+            else {
+                this.api.deletePost(this.id).then( () => {
+                    this.deleteButton.className = className;
+                    document.dispatchEvent(new CustomEvent("post-deleted", {detail: { post:this }})); 
+                    loader.hideLoader();
+                })
+                .catch( (err) => {
+                    loader.hideLoader();
+                    console.error(err);
+                });
+            }
+        }
         this.buildHtml();
         
         if(createPost === true)
@@ -98,12 +121,17 @@ exports.default = class Post {
         let button = document.createElement("button");
         button.innerText = "Website öffnen";
         button.addEventListener("click", () => window.open(this.url, 'modal'));
-        button.classList = "btn btn-link"
+        button.classList = "btn btn-link float-right"
 
         this.editButton = document.createElement("button");
         this.editButton.classList = "btn"
         this.editButton.innerText = "Bearbeiten";
         this.editButton.addEventListener("click", this.edit);
+
+        this.deleteButton = document.createElement("button");
+        this.deleteButton.classList = "btn btn-danger"
+        this.deleteButton.innerText = "Löschen";
+        this.deleteButton.addEventListener("click", this.delete);
 
         this.saveButton = document.createElement("button");
         this.saveButton.classList = "btn"
@@ -111,8 +139,10 @@ exports.default = class Post {
         this.saveButton.style.display = 'none';
         this.saveButton.addEventListener("click", this.save);
 
+    
         footer.appendChild(this.editButton);
         footer.appendChild(this.saveButton);
+        footer.appendChild(this.deleteButton);
         footer.appendChild(button);
         this.html.appendChild(footer);
     }
@@ -126,12 +156,6 @@ exports.default = class Post {
 
     hide(){
         this.parent.removeChild(this.html);
-    }
-
-    delete(){
-        if(this.html){
-            this.html.remove();
-        }
     }
 
 

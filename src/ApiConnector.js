@@ -8,7 +8,7 @@
 const { remote } = require('electron');
 const Loader = require("./Loader").default;
 const axios = require("axios");
-const Curl = require( 'node-libcurl' ).Curl;
+const wpcom = require( 'wpcom' );
 
 const WORDPRESS_BASE_API_URL = "https://public-api.wordpress.com/";
 const REQUEST_TOKEN_URL = WORDPRESS_BASE_API_URL+'oauth2/token'
@@ -28,7 +28,6 @@ exports.default = class ApiConnector {
         this.token_type = null;
         this.site_id = null;
         this.ready = false;
-        this.axiosInstance = null;
 
         this.handleError = (error) => {
             if (error.response) {
@@ -44,6 +43,21 @@ exports.default = class ApiConnector {
         }
     }
 
+    getPosts() {
+        return  this.blog.postsList();       
+    }
+
+    createPost(date, title, content){
+        return this.blog.post().add( { date: date, title: title, content: content } );
+    }
+
+    updatePost(id, title, content){
+        return this.blog.post(id).update( { title: title, content: content } );
+    }
+
+    deletePost(id) {
+        return this.blog.post(id).delete();
+    }
     signIn() {
         return new Promise((resolve, reject) => {
             const code = this.triggerSignIn();
@@ -59,54 +73,13 @@ exports.default = class ApiConnector {
         });
     }
 
-    getPosts() {
-        return new Promise((resolve, reject) => {
-            if (this.ready && this.axiosInstance) {
-                axios.get(WORDPRESS_API_URL + "/sites/" + this.site_url + "/posts/")
-                    .then((response) => {
-                        resolve(response.data);
-                    })
-                    .catch((error) => {
-                        this.handleError(error);
-                        reject(error);
-                    });
-            }
-        });
-    }
-
-    createPost(date, title, content){
-        return new Promise((resolve, reject) => {
-            //if (this.ready && this.axiosInstance) {
-                this.axiosInstance.post("/sites/" + this.site_url + "/posts/new", {
-                    date: date,
-                    title: title,
-                    content: content,
-                    status: "publish"
-                }).then((response) => {
-                    resolve(response.data);
-                })
-                .catch((error) => {
-                    this.handleError(error);
-                    reject(error);
-                });
-            //}
-        });
-    }
-
-    updatePost(){
-        
-    }
-
     initAuthThings(token_type, access_token, site_id) {
         this.ready = true;
         this.access_token = access_token;
         this.token_type = token_type;
         this.site_id = site_id;
-        this.axiosInstance = axios.create({
-            baseURL: WORDPRESS_API_URL,
-            timeout: 1000,
-            headers: { 'Authorization': this.token_type + " " + this.access_token }
-        });
+        this.wp = wpcom(this.access_token);
+        this.blog = this.wp.site(this.site_id);
     }
 
 

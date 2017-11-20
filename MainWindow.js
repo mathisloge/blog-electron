@@ -2,7 +2,7 @@ const ApiConnector = require("./src/ApiConnector").default;
 const Loader = require("./src/Loader").default;
 const Post = require("./src/Post").default;
 const smalltalk = require("smalltalk");
-
+const {Blog} = require("./src/Blog");
 /* url params auslesen. Siehe main.js: site und token werden bisher gesetzt, falls cookies gesetzt wurden. */
 let urlParams;
 (window.onpopstate = function () {
@@ -20,7 +20,7 @@ let urlParams;
 class MainWindow {
     constructor() {
         this.editor;
-        this.postContainer = document.getElementById("posts");
+        this.blog = null;
         if("site" in urlParams && "token" in urlParams){
             this.api = new ApiConnector(this.params.site);
             let checkPromise = this.api.checkToken("Bearer", this.params.token);
@@ -43,13 +43,7 @@ class MainWindow {
     }
 
     newPost(){
-        if(!this.newpost || !this.newpost.editor){
-            this.newpost = new Post(this.api, "Titel", null, null, null, this.postContainer, null, null, null, true);
-            this.posts.push(this.newpost);
-            this.newpost.show();
-        }
-        else
-            smalltalk.alert("Nur ein neuer Post gleichzeitig.", "Es kann nur maximal ein Post gleichzeitig neu erstellt werden.");
+        this.blog.createPost();
     }
 
     openStartupWindow(){
@@ -76,29 +70,8 @@ class MainWindow {
         });
     }
 
-    init(){
-
-        this.loadPosts();
-    }
-
-    loadPosts() {
-        let loader = new Loader();
-        let posts = this.api.getPosts();
-        posts.then((response) => {
-            this.posts = [];
-            for (let post of response.posts) {
-                this.posts.push(new Post(this.api, post.title, post.content, post.tags, post.status, this.postContainer, post.ID, post.URL, post.date));
-            }
-            
-            loader.hideLoader();
-            
-            for (let post of this.posts) {
-                post.show();
-            }
-        }).catch((err) => {
-            console.error(err);
-            loader.hideLoader();
-        });
+    init() {
+        this.blog = new Blog(this.api);
     }
 }
 
