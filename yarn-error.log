@@ -1,0 +1,55 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add electron-builder --dev
+
+PATH: 
+  C:\Python27\;C:\Python27\Scripts;C:\ProgramData\Oracle\Java\javapath;C:\Program Files\Docker\Docker\Resources\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files (x86)\Common Files\Seagate\SnapAPI\;C:\ProgramData\chocolatey\bin;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files (x86)\Bitvise SSH Client;C:\tools\php71;C:\Program Files (x86)\Yarn\bin;C:\Users\mathi\AppData\Local\Microsoft\WindowsApps;C:\Users\mathi\AppData\Roaming\npm;C:\Program Files\Microsoft VS Code\bin;C:\Users\mathi\AppData\Local\Yarn\bin
+
+Yarn version: 
+  1.3.2
+
+Node version: 
+  9.2.0
+
+Platform: 
+  win32 x64
+
+npm manifest: 
+  {
+    "name": "blog-electron",
+    "version": "1.0.0",
+    "description": "",
+    "main": "main.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "electron ."
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/mathisloge/blog-electron.git"
+    },
+    "author": "Mathis Logemann",
+    "license": "Apache-2.0",
+    "bugs": {
+      "url": "https://github.com/mathisloge/blog-electron/issues"
+    },
+    "homepage": "https://github.com/mathisloge/blog-electron#readme",
+    "dependencies": {
+      "axios": "^0.17.0",
+      "jodit": "^3.0.35",
+      "smalltalk": "^2.5.1",
+      "spectre.css": "^0.4.5",
+      "wpcom": "^5.4.0"
+    },
+    "devDependencies": {
+      "electron": "1.7.9"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  Error: EBUSY: resource busy or locked, unlink 'C:\Users\mathi\Documents\git\blog-electron\node_modules\electron\dist\natives_blob.bin'

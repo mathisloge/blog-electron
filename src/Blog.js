@@ -7,7 +7,6 @@ exports.Blog = class Blog {
         this.posts = [];
 
         document.addEventListener("post-deleted", (ev) =>{
-            console.log(ev);
             let post = ev.detail.post;
             let index = this.posts.indexOf(post);
             if(index > -1){
@@ -30,10 +29,6 @@ exports.Blog = class Blog {
 
     addPost(Post){
         this.posts.push(Post);
-    }
-
-    deletePost(){
-
     }
 
     fetchPosts() {

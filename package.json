@@ -5,7 +5,18 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist-win": "electron-builder --win",
+    "dist-mac": "electron-builder --mac",
+    "dist-linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "mathis.logemann.electron.blog",
+    "mac": {
+      "category": "mathis.logemann.electron.blog"
+    }
   },
   "repository": {
     "type": "git",
@@ -25,6 +36,7 @@
     "wpcom": "^5.4.0"
   },
   "devDependencies": {
-    "electron": "1.7.9"
+    "electron": "1.7.9",
+    "electron-builder": "^19.45.5"
   }
 }

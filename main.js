@@ -32,7 +32,7 @@ function createMainWindow (token = null, site = null) {
     })+params);
 
     // Debug
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
     mainWindow.on('closed', () => {
         mainWindow = null
     });
