@@ -17,21 +17,29 @@ body {
   background-color: skyblue;
 }
 
+/*
+Post Container
+*/
 .posts {
-  // css class für den Post-Container
+  
 }
 
-.posts .post {
-  // Container für posts
+#posts .post {
   background-color: white;
   margin-bottom: 20px;
 }
-.posts .post .panel-title {
-  // Die Überschrift
+/*
+Überschrift
+*/
+#posts .post .panel-title {
+
 }
-.posts .post .panel-body {
-  //Container für den Inhalt
+/*
+Inhalt
+*/
+#posts .post .panel-body {
+
 }
-.posts .post .panel-body img {
+#posts .post .panel-body img {
   width: 100%;
 }
